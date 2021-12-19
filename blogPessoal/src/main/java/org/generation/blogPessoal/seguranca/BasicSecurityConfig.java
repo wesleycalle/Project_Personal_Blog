@@ -16,9 +16,11 @@ public class BasicSecurityConfig extends WebSecurityConfigurerAdapter{
 
 	@Autowired
 	private UserDetailsService userDetailsService;
-	
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception{
+		auth.inMemoryAuthentication().withUser("boaz").password(passwordEncoder().encode("boaz"))
+				.authorities("ROLE_ADMIN");
 		auth.userDetailsService(userDetailsService);
 	}
 	

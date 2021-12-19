@@ -29,7 +29,7 @@ public class UsuarioService {
 	}
 
 	// REGRA DE NEGÓCIO QUE VAI DITAR TUDO QUE SE REFERE A LOGAR
-	public Optional<UserLogin> Logar(Optional<UserLogin> user) {
+	public Optional<UserLogin> logar(Optional<UserLogin> user) {
 		
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		Optional<Usuario> usuario = repository.findByUsuario(user.get().getUsuario());

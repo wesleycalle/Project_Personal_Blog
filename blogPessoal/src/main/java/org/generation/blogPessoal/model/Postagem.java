@@ -41,7 +41,11 @@ public class Postagem {
 	@JoinColumn(name = "fk_tema")
 	@JsonIgnoreProperties("postagem")
 	private Tema tema;
-
+	
+	@ManyToOne
+	@JsonIgnoreProperties("postagem")
+	private Usuario usuario;
+	
 	// GETTERS E SETTERS
 
 	public long getId() {
@@ -84,4 +88,12 @@ public class Postagem {
 		this.tema = tema;
 	}
 
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
+	
 }

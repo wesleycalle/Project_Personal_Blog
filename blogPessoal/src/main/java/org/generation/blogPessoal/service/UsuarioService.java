@@ -61,25 +61,40 @@ public class UsuarioService {
 	}
 
 	// REGRA DE NEGÓCIO QUE VAI DITAR TUDO QUE SE REFERE A LOGAR
-	public Optional<UserLogin> logar(Optional<UserLogin> user) {
+	public Optional<UserLogin> autenticarUsuario(Optional<UserLogin> usuarioLogin) {
 
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		Optional<Usuario> usuario = repository.findByUsuario(user.get().getUsuario());
+		Optional<Usuario> usuario = repository.findByUsuario(usuarioLogin.get().getUsuario());
 
 		if (usuario.isPresent()) {
-			if (encoder.matches(user.get().getSenha(), usuario.get().getSenha())) {
 
-				String auth = user.get().getUsuario() + ":" + user.get().getSenha();
-				byte[] encodeAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
-				String authHeader = "Basic " + new String(encodeAuth);
+			if (compararSenhas(usuarioLogin.get().getSenha(), usuario.get().getSenha())) {
 
-				user.get().setToken(authHeader);
-				user.get().setNome(usuario.get().getNome());
-				user.get().setSenha(usuario.get().getSenha());
-				return user;
+				usuarioLogin.get().setId(usuario.get().getId());
+				usuarioLogin.get().setNome(usuario.get().getNome());
+				usuarioLogin.get()
+						.setToken(gerarBasicToken(usuarioLogin.get().getUsuario(), usuarioLogin.get().getSenha()));
+				usuarioLogin.get().setSenha(usuario.get().getSenha());
+
+				return usuarioLogin;
 			}
 		}
 
-		return null;
+		return Optional.empty();
+	}
+
+	private boolean compararSenhas(String senhaDigitada, String senhaBanco) {
+
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+		return encoder.matches(senhaDigitada, senhaBanco);
+
+	}
+
+	private String gerarBasicToken(String usuario, String senha) {
+
+		String token = usuario + ":" + senha;
+		byte[] tokenBase64 = Base64.encodeBase64(token.getBytes(Charset.forName("US-ASCII")));
+		return "Basic " + new String(tokenBase64);
+
 	}
 }

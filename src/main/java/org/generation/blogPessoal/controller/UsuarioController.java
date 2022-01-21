@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.generation.blogPessoal.model.Tema;
 import org.generation.blogPessoal.model.UserLogin;
 import org.generation.blogPessoal.model.Usuario;
 import org.generation.blogPessoal.repository.UsuarioRepository;
@@ -13,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +40,24 @@ public class UsuarioController {
 
 	}
 	
+
+	@GetMapping("/{id}")
+
+	public ResponseEntity<Usuario> getById(@PathVariable long id) {
+
+		return repository.findById(id)
+
+			.map(resp -> ResponseEntity.ok(resp))
+
+			.orElse(ResponseEntity.notFound().build());
+
+	}
+	
+	@GetMapping("/nome/{nome}")
+	public ResponseEntity<List<Usuario>> getByName(@PathVariable String nome) {
+		return ResponseEntity.ok(repository.findAllByNomeContainingIgnoreCase(nome));
+	}
+	
 	@PostMapping("/logar")
 	public ResponseEntity<UserLogin> authentication (@RequestBody @Valid Optional<UserLogin> user){
 		return usuarioService.autenticarUsuario(user).map(resp -> ResponseEntity.ok(resp))
@@ -57,5 +78,10 @@ public class UsuarioController {
 		return usuarioService.atualizarUsuario(usuario)
 			.map(resposta -> ResponseEntity.status(HttpStatus.OK).body(resposta))
 			.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+	}
+	
+	@DeleteMapping ("/{id}")
+	public void delete (@PathVariable long id) {
+		repository.deleteById(id);
 	}
 }
